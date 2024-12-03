@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>
+           :/icons/gui.png</normaloff>
+           :/icons/gui.png</iconset>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>false</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QWidget" name="widget" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>900</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuExamples">
+     <property name="title">
+      <string>&amp;Examples</string>
+     </property>
+    </widget>
+    <addaction name="actionNewMachine"/>
+    <addaction name="actionReload"/>
+    <addaction name="actionPrint"/>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
+    <addaction name="actionClose"/>
+    <addaction name="menuExamples"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="title">
+     <string>&amp;Windows</string>
+    </property>
+    <addaction name="actionRegisters"/>
+    <addaction name="actionProgram_memory"/>
+    <addaction name="actionMemory"/>
+    <addaction name="actionProgram_Cache"/>
+    <addaction name="actionData_Cache"/>
+    <addaction name="actionL2_Cache"/>
+    <addaction name="actionBranch_Predictor_History_table"/>
+    <addaction name="actionBranch_Predictor_Target_table"/>
+    <addaction name="actionBranch_Predictor_Info"/>
+    <addaction name="actionPeripherals"/>
+    <addaction name="actionTerminal"/>
+    <addaction name="actionLcdDisplay"/>
+    <addaction name="actionCsrShow"/>
+    <addaction name="actionCore_View_show"/>
+    <addaction name="actionMessages"/>
+    <addaction name="actionResetWindows"/>
+   </widget>
+   <widget class="QMenu" name="menuMachine">
+    <property name="title">
+     <string>M&amp;achine</string>
+    </property>
+    <addaction name="actionRun"/>
+    <addaction name="actionPause"/>
+    <addaction name="actionStep"/>
+    <addaction name="separator"/>
+    <addaction name="ips1"/>
+    <addaction name="ips2"/>
+    <addaction name="ips5"/>
+    <addaction name="ips10"/>
+    <addaction name="ips25"/>
+    <addaction name="ipsUnlimited"/>
+    <addaction name="ipsMax"/>
+    <addaction name="separator"/>
+    <addaction name="actionRestart"/>
+    <addaction name="actionMnemonicRegisters"/>
+    <addaction name="actionShow_Symbol"/>
+    <addaction name="actionCompileSource"/>
+    <addaction name="actionBuildExe"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAboutQt"/>
+   </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionEditorShowLineNumbers"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuMachine"/>
+   <addaction name="menuWindows"/>
+   <addaction name="menuOptions"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::TopToolBarArea</set>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNewMachine"/>
+   <addaction name="actionReload"/>
+   <addaction name="separator"/>
+   <addaction name="actionRun"/>
+   <addaction name="actionPause"/>
+   <addaction name="actionStep"/>
+   <addaction name="separator"/>
+   <addaction name="ips1"/>
+   <addaction name="ips2"/>
+   <addaction name="ips5"/>
+   <addaction name="ips10"/>
+   <addaction name="ips25"/>
+   <addaction name="ipsUnlimited"/>
+   <addaction name="ipsMax"/>
+   <addaction name="actionNew"/>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionClose"/>
+   <addaction name="actionCompileSource"/>
+   <addaction name="actionBuildExe"/>
+  </widget>
+  <action name="actionNewMachine">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/document-import.png</normaloff>:/icons/document-import.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;New simulation...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionRestart">
+   <property name="text">
+    <string>R&amp;estart</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/new.png</normaloff>:/icons/new.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ne&amp;w source</string>
+   </property>
+   <property name="toolTip">
+    <string>New source</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/open.png</normaloff>:/icons/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open source</string>
+   </property>
+   <property name="toolTip">
+    <string>Open source</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/save.png</normaloff>:/icons/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save source</string>
+   </property>
+   <property name="toolTip">
+    <string>Save source</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Save source &amp;as</string>
+   </property>
+   <property name="toolTip">
+    <string>Save source as</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/closetab.png</normaloff>:/icons/closetab.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Close source</string>
+   </property>
+   <property name="toolTip">
+    <string>Close source</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionCompileSource">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/compfile-256.png</normaloff>:/icons/compfile-256.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Compile Source</string>
+   </property>
+   <property name="toolTip">
+    <string>Compile source and update memory</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionBuildExe">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/build-256.png</normaloff>:/icons/build-256.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Build Executable</string>
+   </property>
+   <property name="toolTip">
+    <string>Build executable by external make</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/application-exit.png</normaloff>:/icons/application-exit.png</iconset>
+   </property>
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit program</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/play.png</normaloff>:/icons/play.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Run</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionStep">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/next.png</normaloff>:/icons/next.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Step</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionPause">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/pause.png</normaloff>:/icons/pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="ips1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;1 instruction per second</string>
+   </property>
+   <property name="iconText">
+    <string>1x</string>
+   </property>
+   <property name="toolTip">
+    <string>Run CPU in speed of single instruction per second</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="ips5">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;5 instructions per second</string>
+   </property>
+   <property name="iconText">
+    <string>5x</string>
+   </property>
+   <property name="toolTip">
+    <string>Run CPU in speed of 5 instructions per second</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="ips10">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>1&amp;0 instructions per second</string>
+   </property>
+   <property name="iconText">
+    <string>10x</string>
+   </property>
+   <property name="toolTip">
+    <string>Run CPU in speed of 10 instructions per second</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="ips25">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>2&amp;5 instructions per second</string>
+   </property>
+   <property name="iconText">
+    <string>25x</string>
+   </property>
+   <property name="toolTip">
+    <string>Run CPU in speed of 25 instructions per second</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F5</string>
+   </property>
+  </action>
+  <action name="ipsUnlimited">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Unlimited</string>
+   </property>
+   <property name="toolTip">
+    <string>Run CPU without any clock constrains</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionMemory">
+   <property name="text">
+    <string>&amp;Memory</string>
+   </property>
+   <property name="toolTip">
+    <string>Data memory view</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actionProgram_memory">
+   <property name="text">
+    <string>&amp;Program</string>
+   </property>
+   <property name="toolTip">
+    <string>Program memory view</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionRegisters">
+   <property name="text">
+    <string>&amp;Registers</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionCsrShow">
+   <property name="text">
+    <string>C&amp;ontrol and Status Registers</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionReload">
+   <property name="icon">
+    <iconset resource="../resources/icons/icons.qrc">
+     <normaloff>:/icons/reload.png</normaloff>:/icons/reload.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Reload simulation</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+R</string>
+   </property>
+  </action>
+  <action name="actionPrint">
+   <property name="text">
+    <string>&amp;Print</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+P</string>
+   </property>
+  </action>
+  <action name="actionProgram_Cache">
+   <property name="text">
+    <string>Pro&amp;gram Cache</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
+  <action name="actionData_Cache">
+   <property name="text">
+    <string>&amp;Data Cache</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+M</string>
+   </property>
+  </action>
+  <action name="actionL2_Cache">
+   <property name="text">
+    <string>L2 Cache</string>
+   </property>
+  </action>
+  <action name="actionResetWindows">
+   <property name="text">
+    <string>Reset Windows</string>
+   </property>
+  </action>
+  <action name="ips2">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;2 instructions per second</string>
+   </property>
+   <property name="iconText">
+    <string>2x</string>
+   </property>
+   <property name="toolTip">
+    <string>Run CPU in speed of two instructions per second</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About Qt&amp;RVSim</string>
+   </property>
+  </action>
+  <action name="ipsMax">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Max</string>
+   </property>
+   <property name="toolTip">
+    <string>Run at maximal speed, skip visualization for 100 msec</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionAboutQt">
+   <property name="text">
+    <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="actionPeripherals">
+   <property name="text">
+    <string>P&amp;eripherals</string>
+   </property>
+  </action>
+  <action name="actionTerminal">
+   <property name="text">
+    <string>&amp;Terminal</string>
+   </property>
+  </action>
+  <action name="actionLcdDisplay">
+   <property name="text">
+    <string>&amp;LCD display</string>
+   </property>
+  </action>
+  <action name="actionShow_Symbol">
+   <property name="text">
+    <string>Sh&amp;ow Symbol</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Symbol</string>
+   </property>
+  </action>
+  <action name="actionCore_View_show">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Core View</string>
+   </property>
+  </action>
+  <action name="actionMessages">
+   <property name="text">
+    <string>Me&amp;ssages</string>
+   </property>
+   <property name="toolTip">
+    <string>Show compile/build messages</string>
+   </property>
+  </action>
+  <action name="actionMnemonicRegisters">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>M&amp;nemonics Registers</string>
+   </property>
+  </action>
+  <action name="actionEditorShowLineNumbers">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show &amp;Line Numbers</string>
+   </property>
+   <property name="toolTip">
+    <string>Show line number in the code editor.</string>
+   </property>
+  </action>
+  <action name="actionBranch_Predictor_History_table">
+   <property name="text">
+    <string>Branch Predictor (History table)</string>
+   </property>
+  </action>
+  <action name="actionBranch_Predictor_Target_table">
+   <property name="text">
+    <string>Branch Predictor (Target table)</string>
+   </property>
+  </action>
+  <action name="actionBranch_Predictor_Info">
+   <property name="text">
+    <string>Branch Predictor (Info)</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../resources/icons/icons.qrc"/>
+ </resources>
+ <connections/>
+</ui>

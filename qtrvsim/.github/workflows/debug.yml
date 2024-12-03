@@ -1,0 +1,282 @@
+name: Debug
+
+on: [ push, workflow_dispatch, pull_request, merge_group ]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    needs: [ build-riscv-tests ]
+    # Avoid duplicate builds on PR from the same repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {
+            name: "Ubuntu Latest GCC",
+            os: ubuntu-latest,
+            build_type: "Debug",
+            cc: "gcc", cxx: "g++", build_system: "Unix Makefiles",
+            qt_version: "native",
+            qt_install_command: "sudo apt-get update && sudo apt-get install qtbase5-dev",
+            # Apt is significantly faster that aqt.
+          }
+          - {
+            name: "Ubuntu Latest GCC + Qt6",
+            os: ubuntu-latest,
+            build_type: "Debug",
+            cc: "gcc", cxx: "g++", build_system: "Unix Makefiles",
+            qt_version: "6.2.1"
+          }
+          - {
+            name: "macOS AMD64 Clang",
+            os: macos-13,
+            build_type: "Debug",
+            cc: "clang", cxx: "clang++", build_system: "Unix Makefiles",
+            qt_version: "5.15.2",
+            # Cached aqt is faster that brew.
+          }
+          - {
+            name: "macOS ARM Clang + Qt6",
+            os: macos-latest,
+            build_type: "Debug",
+            cc: "clang", cxx: "clang++", build_system: "Unix Makefiles",
+            qt_version: "6.6.3",
+            # Cached aqt is faster that brew.
+          }
+          - {
+            name: "Windows 2019 MinGW",
+            os: windows-2019,
+            build_type: "Debug",
+            cc: "gcc", cxx: "g++", build_system: "MinGW Makefiles",
+            # Older Qt releases do not have 64bit mingw release
+            qt_version: "5.12.9", qt_arch: "win64_mingw73"
+          }
+          - {
+            name: "Windows 2022 Clang + Qt6",
+            os: windows-2022,
+            build_type: "Debug",
+            # on Windows, msbuild does not support Clang with GNU-like interface
+            #  and NMake does not support parallel builds
+            cc: "clang", cxx: "clang++", build_system: "Ninja",
+            qt_version: "6.7.0", qt_arch: "win64_msvc2019_64"
+          }
+
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --recursive --init
+
+      - name: Ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11 # https://github.com/hendrikmuhs/ccache-action/issues/181
+        with:
+          key: ${{ github.ref_name }}-${{ matrix.config.name }}
+
+      - name: Install specified Qt version
+        if: matrix.config.qt_version != 'native'
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.config.qt_version }}
+          cache: true
+          cache-key-prefix: ${{ runner.os }}-${{ matrix.config.qt_version }}-Qt
+          arch: ${{ matrix.config.qt_arch }}
+          dir: ${{ github.workspace }}/Qt
+
+      - name: Install native Qt by package manager
+        if: matrix.config.qt_version == 'native'
+        run: ${{ matrix.config.qt_install_command }}
+
+      -  name: Setup Ninja
+         if: matrix.config.build_system == 'Ninja'
+         uses: seanmiddleditch/gha-setup-ninja@v4
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{ github.workspace }}/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        run: "cmake $GITHUB_WORKSPACE
+                    -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+                    -DCMAKE_C_COMPILER=${{ matrix.config.cc }}
+                    -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }}
+                    -DCMAKE_C_COMPILER_LAUNCHER=ccache
+                    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+                    -DFORCE_COLORED_OUTPUT=true
+                    -G \"${{ matrix.config.build_system }}\""
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/build
+        run: cmake --build . -j4
+
+      - name: Deploy on Windows
+        if: runner.os == 'Windows'
+        working-directory: ${{ github.workspace }}/build/target
+        shell: bash
+        run: "windeployqt \"${{ github.workspace }}/build/target/qtrvsim_gui.exe\""
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        shell: bash
+        run: ctest --output-on-failure --verbose
+
+      - name: Get official RISC-V tests
+        if: ${{ steps.cache-tests.outputs.cache-hit != 'true' }}
+        uses: alehechka/download-tartifact@v2
+        with:
+          name: riscv-official-tests
+
+      - name: Official RISC-V tests (single cycle)
+        # The testing python script does not support Ubuntu 18
+        if: matrix.config.os != 'ubuntu-18.04'
+        working-directory: ${{ github.workspace }}/tests/riscv-official
+        #run: python qtrvsim_tester.py --no-64  ${{ github.workspace }}/build/target/qtrvsim_cli
+        run: python qtrvsim_tester.py -M -A ${{ github.workspace }}/build/target/qtrvsim_cli
+
+      - name: Official RISC-V tests (pipelined)
+        # The testing python script does not support Ubuntu 18
+        if: matrix.config.os != 'ubuntu-18.04'
+        working-directory: ${{ github.workspace }}/tests/riscv-official
+        #run: python qtrvsim_tester.py --no-64  ${{ github.workspace }}/build/target/qtrvsim_cli
+        run: python qtrvsim_tester.py -M -A --pipeline ${{ github.workspace }}/build/target/qtrvsim_cli
+
+      - name: Official RISC-V tests (single cycle, cached)
+        # The testing python script does not support Ubuntu 18
+        if: matrix.config.os != 'ubuntu-18.04'
+        working-directory: ${{ github.workspace }}/tests/riscv-official
+        #run: python qtrvsim_tester.py --no-64  ${{ github.workspace }}/build/target/qtrvsim_cli
+        run: python qtrvsim_tester.py -M -A --cache ${{ github.workspace }}/build/target/qtrvsim_cli
+
+      - name: Official RISC-V tests (pipelined, cached)
+        # The testing python script does not support Ubuntu 18
+        if: matrix.config.os != 'ubuntu-18.04'
+        working-directory: ${{ github.workspace }}/tests/riscv-official
+        #run: python qtrvsim_tester.py --no-64  ${{ github.workspace }}/build/target/qtrvsim_cli
+        run: python qtrvsim_tester.py -M -A --pipeline --cache ${{ github.workspace }}/build/target/qtrvsim_cli
+
+      - name: Store created artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: target-${{ runner.os }}-qt${{ matrix.config.qt_version }}
+          path: ${{ github.workspace }}/build/target
+
+  build-emscripten:
+    name: ${{ matrix.config.name }}
+    # Avoid duplicate builds on PR from the same repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {
+            name: "WASM Linux",
+            os: ubuntu-latest,
+            build_type: Release,
+            qt_arch: wasm_32,
+            emsdk_version: 1.39.8,
+            qt_version: 5.15.2,
+          }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11 # https://github.com/hendrikmuhs/ccache-action/issues/181
+        with:
+          key: ${{ github.ref_name }}-${{ matrix.config.name }}
+
+      - name: Setup EMSDK cache
+        id: cache-system-libraries
+        uses: actions/cache@v4
+        with:
+          path: 'emsdk-cache'
+          key: ${{ runner.os }}-${{ matrix.config.emsdk_version }}-${{ matrix.config.qt_version }}-emsdk
+
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: ${{ matrix.config.emsdk_version }}
+          actions-cache-folder: 'emsdk-cache'
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ matrix.config.qt_version }}
+          cache: true
+          cache-key-prefix: 'wasm-qt'
+          arch: ${{ matrix.config.qt_arch }}
+          dir: ${{ github.workspace }}/Qt
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Configure CMake
+        working-directory: ${{github.workspace}}/build
+        run: "emcmake cmake $GITHUB_WORKSPACE
+                    -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }}
+                    -DCMAKE_PREFIX_PATH=$Qt5_DIR
+                    -DCMAKE_FIND_ROOT_PATH=$Qt5_DIR
+                    -DCMAKE_C_COMPILER_LAUNCHER=ccache
+                    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+                    -DFORCE_COLORED_OUTPUT=true
+                    -Wno-dev"
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/build
+        run: cmake --build . -j4
+
+      - name: Store created artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: target-wasm-${{ runner.os }}-qt${{ matrix.config.qt_version }}
+          path: ${{ github.workspace }}/build/target
+
+  build-riscv-tests:
+    name: Build official RISC-V tests
+    # Avoid duplicate builds on PR from the same repository
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: git submodule update --recursive --init
+
+      - name: Get cache key
+        uses: mathiasvr/command-output@v2.0.0
+        id: subtree-hash
+        with:
+          run: git rev-parse HEAD:tests/riscv-official/
+
+      - name: Cache
+        id: cache-tests
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/tests/riscv-official/isa
+          key: riscv-tests-${{ steps.subtree-hash.outputs.stdout }}
+
+      - name: Toolchain for official RISC-V tests
+        if: ${{ steps.cache-tests.outputs.cache-hit != 'true' }}
+        working-directory: ${{ github.workspace }}/tests/riscv-official
+        # Version 14 is needed to correctly process newer parts of RV
+        run: |
+          ### Ubuntu 22 already provides those
+          # echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-14 main" | sudo tee -a /etc/apt/sources.list &&
+          # wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - &&
+          sudo apt-get update &&
+          sudo apt-get install clang-14 lldb-14 lld-14
+
+      - name: Build official RISC-V tests
+        if: ${{ steps.cache-tests.outputs.cache-hit != 'true' }}
+        working-directory: ${{ github.workspace }}/tests/riscv-official/isa
+        env:
+          RISCV_COMPILER: clang-14
+          USE_CLANG_OPTS: true
+          RISCV_OBJDUMP_CMD: llvm-objdump-14
+        run: make
+
+      - name: Store created artifacts
+        # Use of tar significantly improves performance as artifact upload has significant per file penalty
+        uses: alehechka/upload-tartifact@v2
+        with:
+          name: riscv-official-tests
+          path: tests/riscv-official/isa

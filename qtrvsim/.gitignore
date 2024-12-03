@@ -1,0 +1,18 @@
+.*
+!.gitignore
+!.gitmodules
+!.github
+
+# Qt stuff
+*.pro.user*
+*.qbs.user*
+
+# Common test directory
+test_dir
+# Build directory
+build
+/CMakeFiles/
+compile_commands.json
+/src/project_info.h
+# Local settings template
+.dev-config.mk
