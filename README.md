@@ -1,1 +1,1 @@
-I implemented some RISC-V vector instructions based on this porject, [qtrvsim](https://github.com/cvut/qtrvsim).
+Extending the [QTRVSim](https://github.com/cvut/qtrvsim) RISC-V simulator to support vector operations.
